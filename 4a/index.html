@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boys &amp; Girls Clubs of Greater Detroit</title>
+<meta name="description" content="Connecting Detroit youth to the skills, mentors, industries, and opportunity to thrive.">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap">
+<script src="./image-slot.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<style>
+  html, body { margin:0; padding:0; background:#f2f4f7; }
+  body { font-family:'Archivo', system-ui, sans-serif; color:#0a1a2d; -webkit-font-smoothing:antialiased; }
+  * { box-sizing:border-box; }
+  a { color:#2b8bf2; text-decoration:none; }
+  a:hover { color:#5aa9ff; }
+  :focus-visible { outline:2px solid #3d9bff; outline-offset:3px; border-radius:3px; }
+  @keyframes floatline { 0%{transform:translateY(0)} 50%{transform:translateY(-10px)} 100%{transform:translateY(0)} }
+  @keyframes dash { to { stroke-dashoffset:-400; } }
+  @keyframes pulsedot { 0%,100%{ box-shadow:0 0 0 0 rgba(61,155,255,.55) } 50%{ box-shadow:0 0 0 8px rgba(61,155,255,0) } }
+  @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+</style>
+</helmet>
+
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#061426"/><g fill="none" stroke="#3d9bff" stroke-width="4" stroke-linecap="round"><path d="M30 38h20l8 6-8 6H30"/><path d="M30 52h26l8 6-8 6H30"/></g></svg></template>
+
+<div style="width:100%;overflow-x:hidden;background:#f2f4f7">
+
+<header style="position:sticky;top:0;z-index:60;background:#061426;border-bottom:1px solid rgba(255,255,255,.07);transition:box-shadow .3s ease,background .3s ease" ref="{{ headerRef }}">
+  <div style="max-width:1360px;margin:0 auto;padding:14px clamp(16px,4vw,32px);display:flex;align-items:center;gap:clamp(14px,2vw,28px)">
+    <a href="#top" style="display:flex;align-items:center;flex-shrink:0">
+      <img src="assets/logo-light.png" alt="Boys &amp; Girls Clubs of Greater Detroit" style="height:40px;width:auto;display:block">
+    </a>
+    <nav aria-label="Main" style="flex:1;display:flex;justify-content:flex-end;align-items:center;gap:26px;flex-wrap:wrap">
+      <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="6">
+        <a href="#" style="position:relative;color:#dbe6f2;font-size:11.5px;font-weight:700;letter-spacing:.1em;padding:6px 0;transition:color .25s ease" style-hover="color:#fff">{{ item.label }}<span style="position:absolute;left:0;bottom:0;height:2px;width:0;background:#3d9bff;transition:width .28s ease"></span></a>
+      </sc-for>
+      <button type="button" aria-label="Search" onClick="{{ toggleSearch }}" style="background:none;border:0;padding:6px;cursor:pointer;color:#dbe6f2;display:flex;transition:color .2s ease,transform .2s ease" style-hover="color:#3d9bff;transform:scale(1.1)">
+        <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.8 12.8L17 17"/></svg>
+      </button>
+      <a href="#clubs" style="display:flex;align-items:center;gap:10px;background:#1f7ae0;color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.09em;padding:11px 18px;border-radius:6px;transition:background .25s ease,transform .25s ease" style-hover="background:#3d9bff;color:#fff;transform:translateY(-1px)">JOIN A CLUB <svg width="15" height="9" viewBox="0 0 16 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 5h13M10 1l4 4-4 4"/></svg></a>
+      <a href="#donate" style="display:flex;align-items:center;gap:10px;background:#f08a2c;color:#0a1a2d;font-size:11.5px;font-weight:800;letter-spacing:.09em;padding:11px 18px;border-radius:6px;transition:background .25s ease,transform .25s ease" style-hover="background:#ffa347;color:#0a1a2d;transform:translateY(-1px)">DONATE <svg width="15" height="14" viewBox="0 0 16 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M8 13.5S1.5 9.6 1.5 5.6A3.6 3.6 0 018 3.6a3.6 3.6 0 016.5 2c0 4-6.5 7.9-6.5 7.9z"/></svg></a>
+      <button type="button" aria-label="Menu" aria-expanded="{{ menuOpen }}" onClick="{{ toggleMenu }}" style="display:none;background:none;border:0;color:#fff;cursor:pointer" ref="{{ burgerRef }}">
+        <svg width="24" height="16" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 1h22M1 8h22M1 15h22"/></svg>
+      </button>
+    </nav>
+  </div>
+  <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="border-top:1px solid rgba(255,255,255,.08);background:#0a2036">
+      <div style="max-width:1360px;margin:0 auto;padding:16px clamp(16px,4vw,32px);display:flex;gap:12px">
+        <input type="search" placeholder="Search programs, clubs, news…" aria-label="Search the site" style="flex:1;background:#061426;border:1px solid rgba(255,255,255,.16);border-radius:6px;color:#fff;font-family:inherit;font-size:14px;padding:12px 14px">
+        <button type="button" style="background:#1f7ae0;color:#fff;border:0;border-radius:6px;font-family:inherit;font-weight:800;font-size:11.5px;letter-spacing:.09em;padding:0 22px;cursor:pointer">SEARCH</button>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#0a2036;border-top:1px solid rgba(255,255,255,.08);padding:10px clamp(16px,4vw,32px) 22px;display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="6">
+        <a href="#" style="color:#dbe6f2;font-size:13px;font-weight:700;letter-spacing:.09em;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.06)">{{ item.label }}</a>
+      </sc-for>
+    </div>
+  </sc-if>
+</header>
+
+<section id="top" style="position:relative;background:#061426;overflow:hidden;min-height:clamp(600px,88vh,790px);display:flex;align-items:center">
+  <div style="position:absolute;inset:{{ heroInset }};overflow:hidden">
+    <div ref="{{ heroImgRef }}" style="position:absolute;inset:-5%;will-change:transform">
+      <video autoPlay="{{ true }}" muted="{{ true }}" loop="{{ true }}" playsInline="{{ true }}" preload="auto" aria-label="Boys &amp; Girls Clubs of Greater Detroit programs in action" style="width:100%;height:100%;object-fit:cover;display:block" src="uploads/sizzle.mp4"></video>
+    </div>
+    <div style="position:absolute;inset:0;background:linear-gradient(90deg,#061426 0%,#061426 14%,rgba(6,20,38,.82) 34%,rgba(6,20,38,.12) 70%,rgba(6,20,38,.35) 100%);pointer-events:none"></div>
+    <div style="position:absolute;inset:0;background:{{ heroScrim }};pointer-events:none"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,20,38,.55) 0%,transparent 30%,rgba(6,20,38,.5) 100%);pointer-events:none"></div>
+  </div>
+
+  <svg viewBox="0 0 700 400" preserveAspectRatio="none" aria-hidden="true" style="position:absolute;right:0;bottom:0;width:62%;height:70%;pointer-events:none;opacity:.85">
+    <path d="M-20 380C120 380 200 300 320 250S560 150 720 150" fill="none" stroke="#3d9bff" stroke-width="1.6" stroke-dasharray="6 8" style="animation:dash 14s linear infinite"/>
+    <path d="M-20 395C140 395 240 330 360 280S600 190 720 195" fill="none" stroke="#f08a2c" stroke-width="1.2" opacity=".8"/>
+    <path d="M-20 360C100 360 180 280 300 220S540 120 720 110" fill="none" stroke="#3d9bff" stroke-width="1" opacity=".45"/>
+  </svg>
+
+  <div style="position:relative;z-index:3;max-width:1360px;margin:0 auto;padding:clamp(96px,13vh,132px) clamp(16px,4vw,32px) clamp(104px,14vh,148px);width:100%">
+    <div style="max-width:600px">
+      <div data-reveal="up" data-delay="0" style="display:flex;align-items:center;gap:12px;margin-bottom:22px">
+        <span style="display:block;width:34px;height:2px;background:#3d9bff"></span>
+        <span style="color:#3d9bff;font-size:11.5px;font-weight:800;letter-spacing:.16em">GREAT FUTURES START HERE.</span>
+      </div>
+      <h1 data-reveal="up" data-delay="90" style="margin:0 0 26px;color:#fff;font-weight:900;font-size:clamp(46px,7vw,84px);line-height:.98;letter-spacing:-.03em">Built for<br>What's <span style="color:#3d9bff">Next</span></h1>
+      <p data-reveal="up" data-delay="180" style="margin:0 0 38px;max-width:420px;color:#c6d5e5;font-size:16.5px;line-height:1.6">Connecting Detroit youth to the skills, mentors, industries, and opportunity to thrive.</p>
+      <div data-reveal="up" data-delay="260" style="display:flex;align-items:center;gap:26px;flex-wrap:wrap">
+        <a href="#clubs" style="display:flex;align-items:center;gap:14px;background:#1f7ae0;color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.1em;padding:17px 26px;border-radius:6px;box-shadow:0 14px 34px rgba(31,122,224,.35);transition:transform .25s ease,background .25s ease" style-hover="background:#3d9bff;color:#fff;transform:translateY(-2px)">FIND A CLUB NEAR YOU <svg width="17" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M1 5h14M11 1l4 4-4 4"/></svg></a>
+        <a href="#story" style="display:flex;align-items:center;gap:14px;color:#fff;font-size:12px;font-weight:800;letter-spacing:.1em;transition:color .2s ease" style-hover="color:#3d9bff">WATCH OUR STORY
+          <span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#fff;color:#061426;animation:pulsedot 2.6s ease-in-out infinite">
+            <svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor"><path d="M0 0l10 6-10 6z"/></svg>
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="position:relative;background:#f2f4f7;border-radius:34px 34px 0 0;margin-top:-34px;padding:60px 0 0;z-index:4">
+  <div style="max-width:1360px;margin:0 auto;padding:0 clamp(16px,4vw,32px);display:flex;gap:44px;align-items:flex-start;flex-wrap:wrap">
+    <div data-reveal="left" style="flex:0 1 300px;min-width:260px;padding-top:6px">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:18px">
+        <span style="width:7px;height:7px;background:#3d9bff;transform:rotate(45deg);display:block"></span>
+        <span style="color:#1f7ae0;font-size:10.5px;font-weight:800;letter-spacing:.18em">A PATH FOR EVERY FUTURE</span>
+      </div>
+      <h2 style="margin:0 0 18px;font-size:clamp(30px,3.4vw,40px);font-weight:900;line-height:1.06;letter-spacing:-.025em">Belong. Build.<br><span style="color:#1f7ae0">Lead.</span></h2>
+      <p style="margin:0 0 24px;color:#5a6c80;font-size:15px;line-height:1.65;max-width:280px">Age-specific programs and guidance that grow with youth — from first steps to future leaders.</p>
+      <a href="#journey" style="display:inline-flex;align-items:center;gap:10px;color:#1f7ae0;font-size:11.5px;font-weight:800;letter-spacing:.12em" style-hover="color:#0f5fb8;gap:16px">EXPLORE THE JOURNEY <svg width="17" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M1 5h14M11 1l4 4-4 4"/></svg></a>
+    </div>
+
+    <div id="journey" style="flex:1 1 620px;display:flex;flex-wrap:wrap;align-items:stretch;gap:14px 8px;min-width:0">
+      <sc-for list="{{ stages }}" as="s" hint-placeholder-count="3">
+        <div data-reveal="up" style="flex:1 1 210px;min-width:200px;display:flex;align-items:center;gap:8px">
+          <div data-card style="position:relative;flex:1;height:252px;transform:skewX(-8deg);overflow:hidden;border-radius:8px;background:#fff;border:2px solid;border-color:{{ s.color }};box-shadow:0 10px 30px rgba(10,26,45,.09);transition:transform .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s ease" style-hover="box-shadow:0 22px 46px rgba(10,26,45,.18);transform:skewX(-8deg) translateY(-8px)">
+            <div style="position:absolute;inset:0 -14px;transform:skewX(8deg);display:flex">
+              <div style="flex:1.05;position:relative;padding:26px 14px 20px 26px">
+                <div style="font-size:50px;font-weight:900;color:#e3e8ef;line-height:1;letter-spacing:-.04em">{{ s.num }}</div>
+                <div style="margin-top:6px;font-size:19px;font-weight:900;font-style:italic;letter-spacing:-.01em;color:{{ s.color }}">{{ s.title }}</div>
+                <div style="margin-top:3px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#0a1a2d">{{ s.ages }}</div>
+                <div style="margin-top:12px;font-size:11.5px;font-style:italic;line-height:1.5;color:#5a6c80;max-width:150px">{{ s.copy }}</div>
+              </div>
+              <div style="flex:1;position:relative;overflow:hidden">
+                <div data-zoom style="position:absolute;inset:0;transition:transform .6s cubic-bezier(.2,.7,.3,1)">
+                  <image-slot id="{{ s.slot }}" shape="rect" src="{{ s.src }}" placeholder="{{ s.ph }}"></image-slot>
+                </div>
+              </div>
+            </div>
+          </div>
+          <sc-if value="{{ s.arrow }}" hint-placeholder-val="{{ true }}">
+            <svg data-arrow width="22" height="12" viewBox="0 0 22 12" fill="none" stroke="#0a1a2d" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" style="flex-shrink:0;transition:transform .3s ease"><path d="M0 6h18M14 1.5L19.5 6 14 10.5"/></svg>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section style="background:#f2f4f7;padding:56px 0 0">
+  <div style="max-width:1360px;margin:0 auto;padding:0 clamp(16px,4vw,32px)">
+    <div data-reveal="up" style="position:relative;overflow:hidden;background:linear-gradient(115deg,#061426 0%,#0a2036 62%,#0d2a45 100%);border-radius:16px;padding:clamp(26px,3vw,38px) clamp(20px,3.4vw,46px) clamp(30px,3.4vw,44px)">
+      <svg viewBox="0 0 320 200" aria-hidden="true" style="position:absolute;right:0;top:0;height:100%;width:320px;pointer-events:none;opacity:.5">
+        <g fill="none" stroke="#3d9bff" stroke-width="1">
+          <path d="M320 0C250 20 236 60 240 100s-10 70-80 100" opacity=".55"/>
+          <path d="M320 30C258 48 246 82 250 116s-16 62-86 84" opacity=".35"/>
+          <path d="M300 -10C240 30 300 70 260 120" opacity=".25"/>
+        </g>
+        <g fill="none" stroke="#f08a2c" stroke-width="1" opacity=".35"><path d="M320 60C268 76 258 104 262 132"/></g>
+      </svg>
+      <div style="position:relative;color:#f08a2c;font-size:10.5px;font-weight:800;letter-spacing:.18em;margin-bottom:26px">OUR IMPACT IN GREATER DETROIT</div>
+      <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:26px 14px">
+        <sc-for list="{{ stats }}" as="st" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:16px;padding-left:8px;border-left:1px solid rgba(255,255,255,.1)">
+            <div style="flex-shrink:0;width:52px;height:52px;border-radius:50%;background:rgba(61,155,255,.14);border:1px solid rgba(61,155,255,.35);display:flex;align-items:center;justify-content:center;color:#3d9bff" data-icon>
+              <div style="width:24px;height:24px;display:flex" dangerouslySetInnerHTML="{{ st.icon }}"></div>
+            </div>
+            <div>
+              <div data-count="{{ st.value }}" data-suffix="{{ st.suffix }}" style="color:#fff;font-size:33px;font-weight:900;letter-spacing:-.02em;line-height:1">{{ st.shown }}</div>
+              <div style="margin-top:6px;color:#9fb4c9;font-size:10.5px;font-weight:800;letter-spacing:.1em;line-height:1.4;max-width:160px">{{ st.label }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#f2f4f7;padding:52px 0 0">
+  <div style="max-width:1360px;margin:0 auto;padding:0 clamp(16px,4vw,32px)">
+    <a href="#register" data-reveal="up" data-card aria-label="Fall school year membership registration is live — register today" style="display:block;position:relative;border-radius:12px;overflow:hidden;box-shadow:0 10px 28px rgba(10,26,45,.12);transition:transform .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-4px);box-shadow:0 22px 46px rgba(10,26,45,.2)">
+      <div style="position:relative;aspect-ratio:1800/520">
+        <image-slot id="fall-registration" shape="rect" fit="cover" src="uploads/fallreg.jpg" placeholder="Drop registration banner"></image-slot>
+      </div>
+    </a>
+  </div>
+</section>
+
+<section style="background:#f2f4f7;padding:66px 0 0">
+  <div style="max-width:1360px;margin:0 auto;padding:0 clamp(16px,4vw,32px)">
+    <div data-reveal="up" style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:26px">
+      <div>
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
+          <span style="width:7px;height:7px;background:#3d9bff;transform:rotate(45deg);display:block"></span>
+          <span style="color:#1f7ae0;font-size:10.5px;font-weight:800;letter-spacing:.18em">FUTURES WITHOUT LIMITS</span>
+        </div>
+        <h2 style="margin:0;font-size:clamp(30px,3.4vw,40px);font-weight:900;letter-spacing:-.025em">Explore Our <span style="color:#1f7ae0">Programs</span></h2>
+      </div>
+      <a href="#programs" style="display:inline-flex;align-items:center;gap:10px;color:#1f7ae0;font-size:11px;font-weight:800;letter-spacing:.12em;padding-bottom:8px" style-hover="color:#0f5fb8;gap:16px">VIEW ALL PROGRAMS <svg width="17" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M1 5h14M11 1l4 4-4 4"/></svg></a>
+    </div>
+    <div id="programs" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:20px">
+      <sc-for list="{{ programs }}" as="p" hint-placeholder-count="4">
+        <article data-reveal="up" data-card style="position:relative;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(10,26,45,.08);transition:transform .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s ease" style-hover="transform:translateY(-8px);box-shadow:0 26px 50px rgba(10,26,45,.16)">
+          <div style="position:relative;height:104px;overflow:hidden">
+            <div data-zoom style="position:absolute;inset:0;transition:transform .6s cubic-bezier(.2,.7,.3,1)">
+              <image-slot id="{{ p.slot }}" shape="rect" src="{{ p.src }}" placeholder="{{ p.ph }}"></image-slot>
+            </div>
+          </div>
+          <div style="position:relative;padding:26px 20px 22px">
+            <div data-icon style="position:absolute;top:-19px;left:20px;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;background:{{ p.color }};box-shadow:0 6px 16px rgba(10,26,45,.22);transition:transform .35s ease">
+              <div style="width:19px;height:19px;display:flex" dangerouslySetInnerHTML="{{ p.icon }}"></div>
+            </div>
+            <h3 style="margin:0 0 10px;font-size:15.5px;font-weight:900;line-height:1.25;letter-spacing:-.01em">{{ p.title }}</h3>
+            <p style="margin:0 0 18px;color:#5a6c80;font-size:12.5px;line-height:1.6">{{ p.copy }}</p>
+            <a href="#programs" aria-label="{{ p.aria }}" style="display:flex;justify-content:flex-end;color:#1f7ae0" style-hover="color:#0f5fb8">
+              <svg data-arrow width="20" height="11" viewBox="0 0 20 11" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" style="transition:transform .3s ease"><path d="M0 5.5h16M12 1l4.5 4.5L12 10"/></svg>
+            </a>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="story" style="background:#f2f4f7;padding:62px 0 0">
+  <div style="max-width:1360px;margin:0 auto;padding:0 clamp(16px,4vw,32px)">
+    <div data-reveal="up" style="position:relative;overflow:hidden;border-radius:16px;background:linear-gradient(110deg,#061426 0%,#0a2036 60%,#0d2a45 100%);display:flex;flex-wrap:wrap">
+      <div style="position:relative;flex:0 1 260px;min-width:200px;min-height:270px">
+        <image-slot id="success-story" shape="rect" src="uploads/highland-park.png" placeholder="Drop a portrait of Marcus"></image-slot>
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 55%,rgba(6,20,38,.9) 100%);pointer-events:none"></div>
+      </div>
+      <div style="flex:1 1 480px;min-width:0;padding:clamp(28px,4vw,44px) clamp(22px,3vw,40px) clamp(28px,3vw,40px);display:flex;flex-direction:column;justify-content:center">
+        <div style="display:flex;gap:16px">
+          <span style="display:block;width:3px;background:#3d9bff;flex-shrink:0;border-radius:2px"></span>
+          <blockquote style="margin:0;color:#fff;font-size:clamp(20px,2.2vw,27px);font-weight:800;line-height:1.28;letter-spacing:-.02em">“The Club gave me the tools<br>to turn my ideas into a future.”</blockquote>
+        </div>
+        <div style="margin:22px 0 0 19px">
+          <div style="color:#f08a2c;font-size:12px;font-weight:800;letter-spacing:.09em">— MARCUS J.</div>
+          <div style="margin-top:5px;color:#9fb4c9;font-size:11.5px">BGCGD Alum &amp; Aspiring Engineer</div>
+        </div>
+        <div style="margin:30px 0 0 19px;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:18px" data-timeline>
+          <sc-for list="{{ timeline }}" as="t" hint-placeholder-count="4">
+            <div style="position:relative">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span data-tdot style="flex-shrink:0;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:{{ t.color }};color:#061426;opacity:.35;transform:scale(.85);transition:opacity .5s ease,transform .5s ease">
+                  <div style="width:13px;height:13px;display:flex" dangerouslySetInnerHTML="{{ t.icon }}"></div>
+                </span>
+                <span style="flex:1;height:1px;border-top:1px dashed rgba(159,180,201,.45)"></span>
+              </div>
+              <div style="margin-top:12px;color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.1em">{{ t.label }}</div>
+              <div style="margin-top:5px;color:#8fa6bd;font-size:11px;line-height:1.45">{{ t.copy }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="position:relative;flex:0 1 260px;min-width:220px;padding:clamp(8px,3vw,44px) clamp(22px,3vw,40px) clamp(28px,3vw,40px) clamp(22px,3vw,0px);display:flex;flex-direction:column;justify-content:center">
+        <svg viewBox="0 0 200 260" aria-hidden="true" style="position:absolute;right:0;top:0;height:100%;width:200px;pointer-events:none;opacity:.6">
+          <g fill="none" stroke="#3d9bff" stroke-width="1"><path d="M200 0C150 40 176 100 150 140s-6 90-60 120" opacity=".5"/><path d="M200 40C160 70 182 118 158 150" opacity=".3"/></g>
+          <g fill="none" stroke="#f08a2c" stroke-width="1" opacity=".5"><path d="M200 90C168 108 160 140 166 176"/></g>
+        </svg>
+        <p style="position:relative;margin:0 0 22px;color:#dbe6f2;font-size:13.5px;line-height:1.7;max-width:210px">Today, Marcus is studying engineering and mentoring the next generation.</p>
+        <a href="#news" style="position:relative;display:inline-flex;align-items:center;gap:10px;color:#3d9bff;font-size:11px;font-weight:800;letter-spacing:.12em" style-hover="color:#7fbcff;gap:16px">SEE MORE STORIES <svg width="17" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M1 5h14M11 1l4 4-4 4"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="locations" style="background:#f2f4f7;padding:66px 0 0">
+  <div style="max-width:1360px;margin:0 auto;padding:0 clamp(16px,4vw,32px)">
+    <div data-reveal="up" style="max-width:560px;margin-bottom:28px">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
+        <span style="width:7px;height:7px;background:#3d9bff;transform:rotate(45deg);display:block"></span>
+        <span style="color:#1f7ae0;font-size:10.5px;font-weight:800;letter-spacing:.18em">FIND YOUR CLUB</span>
+      </div>
+      <h2 style="margin:0 0 16px;font-size:clamp(30px,3.4vw,40px);font-weight:900;letter-spacing:-.025em">A club within <span style="color:#1f7ae0">reach.</span></h2>
+      <p style="margin:0;color:#5a6c80;font-size:15px;line-height:1.65">Clubs across Greater Detroit, in the neighborhoods where our members live and go to school. Search a ZIP code or pick a Club to see it on the map.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:28px;align-items:stretch">
+      <div data-reveal="left" style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <form onSubmit="{{ onFindClub }}" style="display:flex;gap:0">
+          <label for="zip" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">ZIP code</label>
+          <input id="zip" type="text" inputMode="numeric" value="{{ zip }}" onChange="{{ onZip }}" placeholder="Enter your ZIP code" style="flex:1;min-width:0;background:#fff;border:1px solid #d3dae3;border-right:0;border-radius:6px 0 0 6px;color:#0a1a2d;font-family:inherit;font-size:14px;padding:14px 16px">
+          <button type="submit" style="display:flex;align-items:center;gap:12px;background:#1f7ae0;border:0;border-radius:0 6px 6px 0;color:#fff;font-family:inherit;font-size:11.5px;font-weight:800;letter-spacing:.1em;padding:0 22px;cursor:pointer;transition:background .25s ease" style-hover="background:#3d9bff">FIND A CLUB <svg width="16" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M1 5h14M11 1l4 4-4 4"/></svg></button>
+        </form>
+        <div aria-live="polite" style="min-height:18px;font-size:12.5px;color:{{ zipColor }}">{{ zipNote }}</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;flex:1">
+          <sc-for list="{{ clubs }}" as="c" hint-placeholder-count="9">
+            <button type="button" onClick="{{ c.pick }}" aria-pressed="{{ c.active }}" style="text-align:left;cursor:pointer;font-family:inherit;background:{{ c.bg }};border:1px solid {{ c.border }};border-left:3px solid {{ c.accent }};border-radius:8px;padding:14px 14px 13px;box-shadow:0 4px 14px rgba(10,26,45,.06);transition:transform .25s ease,box-shadow .25s ease,background .25s ease" style-hover="transform:translateY(-3px);box-shadow:0 12px 26px rgba(10,26,45,.13)">
+              <div style="display:flex;align-items:flex-start;gap:8px">
+                <img src="uploads/location_53876-25530.avif" alt="" style="width:14px;height:14px;object-fit:contain;flex-shrink:0;margin-top:1px">
+                <div style="min-width:0">
+                  <div style="font-size:13px;font-weight:900;line-height:1.25;color:{{ c.title }}">{{ c.name }}</div>
+                  <div style="margin-top:6px;font-size:11px;color:{{ c.sub }};line-height:1.4">{{ c.area }}</div>
+                  <div style="margin-top:8px;font-size:10px;font-weight:800;letter-spacing:.12em;color:{{ c.zipColor }}">ZIP {{ c.zip }}</div>
+                </div>
+              </div>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+      <div data-reveal="right" style="position:relative;min-width:0;align-self:stretch;border-radius:12px;overflow:hidden;box-shadow:0 12px 34px rgba(10,26,45,.14);background:#dfe4ea;min-height:min(470px,72vw)">
+        <div id="club-map" style="position:absolute;inset:0"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#f2f4f7;padding:70px 0 0">
+  <div style="max-width:1360px;margin:0 auto;padding:0 clamp(16px,4vw,32px)">
+    <div data-reveal="up" style="max-width:620px;margin-bottom:26px">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
+        <span style="width:7px;height:7px;background:#f08a2c;transform:rotate(45deg);display:block"></span>
+        <span style="color:#c96f14;font-size:10.5px;font-weight:800;letter-spacing:.18em">1926 — 2026</span>
+      </div>
+      <h2 style="margin:0 0 14px;font-size:clamp(30px,3.4vw,40px);font-weight:900;letter-spacing:-.025em">One hundred years <span style="color:#1f7ae0">in Detroit</span></h2>
+      <p style="margin:0;color:#5a6c80;font-size:15px;line-height:1.65">A century of Detroit youth growing up in the Club — from the first game rooms to today's media labs and career pathways.</p>
+    </div>
+    <div data-reveal="up" data-card style="position:relative;border-radius:12px;overflow:hidden;background:#061426;box-shadow:0 12px 34px rgba(10,26,45,.16)">
+      <div style="position:relative;width:100%;aspect-ratio:2000/230">
+        <div data-zoom style="position:absolute;inset:0;transition:transform .8s cubic-bezier(.2,.7,.3,1)">
+          <image-slot id="century-band" shape="rect" src="uploads/band.jpg" placeholder="Drop the century photo band"></image-slot>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 24px;background:#061426">
+        <sc-for list="{{ eras }}" as="e" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="width:6px;height:6px;border-radius:50%;background:#3d9bff;display:block"></span>
+            <span style="color:#fff;font-size:11px;font-weight:800;letter-spacing:.1em">{{ e.year }}</span>
+            <span style="color:#8fa6bd;font-size:11px">{{ e.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="news" style="background:#f2f4f7;padding:62px 0 74px">
+  <div style="max-width:1360px;margin:0 auto;padding:0 clamp(16px,4vw,32px)">
+    <div data-reveal="up" style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:24px">
+      <h2 style="margin:0;font-size:clamp(30px,3.4vw,40px);font-weight:900;letter-spacing:-.025em">News &amp; <span style="color:#1f7ae0">Stories</span></h2>
+      <a href="#news" style="display:inline-flex;align-items:center;gap:10px;color:#1f7ae0;font-size:11px;font-weight:800;letter-spacing:.12em;padding-bottom:8px" style-hover="color:#0f5fb8;gap:16px">VIEW ALL NEWS <svg width="17" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M1 5h14M11 1l4 4-4 4"/></svg></a>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:28px;align-items:stretch">
+      <article data-reveal="left" data-card style="background:#fff;border-radius:12px;overflow:hidden;display:flex;flex-wrap:wrap;height:100%;box-shadow:0 8px 24px rgba(10,26,45,.08);transition:transform .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-6px);box-shadow:0 24px 46px rgba(10,26,45,.15)">
+        <div style="position:relative;flex:1 1 220px;min-height:230px">
+          <div data-zoom style="position:absolute;inset:0;overflow:hidden;transition:transform .6s cubic-bezier(.2,.7,.3,1)">
+            <image-slot id="news-featured" shape="rect" src="uploads/michigan-central.avif" placeholder="Drop Detroit skyline image"></image-slot>
+          </div>
+          <span style="position:absolute;top:14px;left:14px;background:#1f7ae0;color:#fff;font-size:9.5px;font-weight:800;letter-spacing:.14em;padding:7px 11px;border-radius:4px">FEATURED STORY</span>
+        </div>
+        <div style="flex:1 1 240px;padding:30px 26px;display:flex;flex-direction:column;justify-content:center">
+          <h3 style="margin:0 0 14px;font-size:18px;font-weight:900;line-height:1.28;letter-spacing:-.015em">BGCGD &amp; Ford Expand Mobility Pathway Program</h3>
+          <p style="margin:0 0 22px;color:#5a6c80;font-size:12.5px;line-height:1.65">New partnership creates paid learning experiences for Detroit youth in advanced manufacturing and EV tech.</p>
+          <a href="#news" style="display:inline-flex;align-items:center;gap:10px;color:#1f7ae0;font-size:10.5px;font-weight:800;letter-spacing:.12em" style-hover="color:#0f5fb8;gap:16px">READ THE STORY <svg width="17" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M1 5h14M11 1l4 4-4 4"/></svg></a>
+        </div>
+      </article>
+      <div style="display:flex;flex-direction:column;gap:14px;height:100%">
+        <sc-for list="{{ news }}" as="n" hint-placeholder-count="3">
+          <article data-reveal="right" data-card style="flex:1;display:flex;gap:18px;align-items:center;background:#fff;border-radius:10px;padding:12px;box-shadow:0 4px 16px rgba(10,26,45,.06);transition:transform .3s ease,box-shadow .3s ease" style-hover="transform:translateX(5px);box-shadow:0 14px 30px rgba(10,26,45,.12)">
+            <div style="position:relative;flex:0 0 124px;align-self:stretch;min-height:74px;overflow:hidden;border-radius:6px">
+              <div data-zoom style="position:absolute;inset:0;transition:transform .5s ease">
+                <image-slot id="{{ n.slot }}" shape="rect" radius="6" src="{{ n.src }}" placeholder="{{ n.ph }}"></image-slot>
+              </div>
+            </div>
+            <div style="min-width:0">
+              <div style="color:#8494a6;font-size:9.5px;font-weight:800;letter-spacing:.13em">{{ n.date }}</div>
+              <h3 style="margin:6px 0 8px;font-size:13.5px;font-weight:900;line-height:1.3;letter-spacing:-.01em">{{ n.title }}</h3>
+              <a href="#news" style="display:inline-flex;align-items:center;gap:8px;color:#1f7ae0;font-size:9.5px;font-weight:800;letter-spacing:.12em" style-hover="color:#0f5fb8;gap:14px">READ MORE <svg width="15" height="9" viewBox="0 0 16 10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M1 5h12M9.5 1L13.5 5l-4 4"/></svg></a>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#f2f4f7;padding:0 0 74px">
+  <div data-reveal="up" style="max-width:1360px;margin:0 auto;padding:0 clamp(16px,4vw,32px);display:flex;align-items:center;gap:40px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <span style="display:block;width:28px;height:1px;background:#b8c3cf"></span>
+      <span style="color:#5a6c80;font-size:10.5px;font-weight:800;letter-spacing:.18em">BGCGD FEATURED IN</span>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:space-between;gap:34px;flex-wrap:wrap;min-width:260px">
+      <img src="uploads/nbcnews.webp" alt="NBC News" style="width:180px;height:82px;object-fit:contain;mix-blend-mode:multiply;filter:grayscale(1);opacity:.78;transition:filter .3s ease,opacity .3s ease" style-hover="filter:grayscale(0);opacity:1">
+      <img src="uploads/nprlogo.jpg" alt="NPR" style="width:180px;height:82px;object-fit:contain;mix-blend-mode:multiply;filter:grayscale(1);opacity:.78;transition:filter .3s ease,opacity .3s ease" style-hover="filter:grayscale(0);opacity:1">
+      <img src="uploads/detroitnewslogo.webp" alt="The Detroit News" style="width:180px;height:82px;object-fit:contain;mix-blend-mode:multiply;filter:grayscale(1);opacity:.78;transition:filter .3s ease,opacity .3s ease" style-hover="filter:grayscale(0);opacity:1">
+      <img src="uploads/APlogo.webp" alt="The Associated Press" style="width:180px;height:82px;object-fit:contain;mix-blend-mode:multiply;filter:grayscale(1);opacity:.78;transition:filter .3s ease,opacity .3s ease" style-hover="filter:grayscale(0);opacity:1">
+      <img src="uploads/crainslogo.webp" alt="Crain's Detroit Business" style="width:180px;height:82px;object-fit:contain;mix-blend-mode:multiply;filter:grayscale(1);opacity:.78;transition:filter .3s ease,opacity .3s ease" style-hover="filter:grayscale(0);opacity:1">
+    </div>
+  </div>
+</section>
+
+<section id="clubs" style="position:relative;overflow:hidden;background:linear-gradient(105deg,#061426 0%,#0a2036 55%,#0d2a45 100%);padding:56px 0">
+  <div style="position:absolute;right:0;bottom:0;width:34%;height:100%;opacity:.22">
+    <image-slot id="detroit-skyline" shape="rect" src="uploads/michigan-central.avif" placeholder="Drop skyline"></image-slot>
+  </div>
+  <div style="position:absolute;inset:0;background:linear-gradient(90deg,#061426 0%,rgba(6,20,38,.9) 55%,rgba(6,20,38,.5) 100%);pointer-events:none"></div>
+  <svg viewBox="0 0 200 300" aria-hidden="true" style="position:absolute;left:0;top:0;height:100%;width:180px;pointer-events:none;opacity:.55">
+    <g fill="none" stroke="#3d9bff" stroke-width="1"><path d="M0 0C60 50 24 120 60 170s6 90 -20 130" opacity=".5"/><path d="M0 50C48 88 20 140 44 180" opacity=".3"/></g>
+    <g fill="none" stroke="#f08a2c" stroke-width="1" opacity=".45"><path d="M0 120C40 150 26 190 34 240"/></g>
+  </svg>
+  <div style="position:relative;max-width:1360px;margin:0 auto;padding:0 clamp(16px,4vw,32px);display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap">
+    <h2 data-reveal="left" style="margin:0;color:#fff;font-size:clamp(26px,3.1vw,37px);font-weight:900;line-height:1.16;letter-spacing:-.025em">Their future.<br>Our mission. <span style="color:#3d9bff">Detroit's future.</span></h2>
+    <div data-reveal="right" style="display:flex;gap:18px;flex-wrap:wrap">
+      <a href="#clubs" style="display:flex;align-items:center;gap:14px;background:#1f7ae0;color:#fff;font-size:12px;font-weight:800;letter-spacing:.1em;padding:16px 26px;border-radius:6px;transition:background .25s ease,transform .25s ease" style-hover="background:#3d9bff;color:#fff;transform:translateY(-2px)">FIND A CLUB NEAR YOU <svg width="17" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M1 5h14M11 1l4 4-4 4"/></svg></a>
+      <a href="#clubs" style="display:flex;align-items:center;gap:14px;border:1px solid rgba(255,255,255,.4);color:#fff;font-size:12px;font-weight:800;letter-spacing:.1em;padding:16px 26px;border-radius:6px;transition:background .25s ease,border-color .25s ease,transform .25s ease" style-hover="background:rgba(255,255,255,.1);border-color:#fff;color:#fff;transform:translateY(-2px)">JOIN A CLUB TODAY <svg width="17" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M1 5h14M11 1l4 4-4 4"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<footer style="background:#061426;padding:54px 0 0">
+  <div style="max-width:1360px;margin:0 auto;padding:0 clamp(16px,4vw,32px)">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:38px 28px;padding-bottom:38px">
+      <div style="grid-column:span 2;min-width:0;padding-right:20px">
+        <div style="margin-bottom:18px">
+          <img src="assets/logo-light.png" alt="Boys &amp; Girls Clubs of Greater Detroit" style="height:44px;width:auto;display:block">
+        </div>
+        <p style="margin:0 0 22px;color:#9fb4c9;font-size:12.5px;line-height:1.7;max-width:250px">Inspiring and enabling all young people, especially those who need us most, to reach their full potential.</p>
+        <div style="display:flex;gap:12px">
+          <sc-for list="{{ socials }}" as="so" hint-placeholder-count="4">
+            <a href="#" aria-label="{{ so.name }}" style="width:30px;height:30px;border-radius:6px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;color:#c6d5e5;transition:background .25s ease,color .25s ease,transform .25s ease" style-hover="background:#1f7ae0;color:#fff;transform:translateY(-2px)">
+              <div style="width:15px;height:15px;display:flex" dangerouslySetInnerHTML="{{ so.icon }}"></div>
+            </a>
+          </sc-for>
+        </div>
+      </div>
+      <sc-for list="{{ footerCols }}" as="col" hint-placeholder-count="3">
+        <div style="min-width:0">
+          <div style="color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.16em;margin-bottom:18px">{{ col.title }}</div>
+          <div style="display:flex;flex-direction:column;gap:11px">
+            <sc-for list="{{ col.links }}" as="l" hint-placeholder-count="4">
+              <a href="#" style="color:#9fb4c9;font-size:12.5px;transition:color .2s ease,padding-left .2s ease" style-hover="color:#3d9bff;padding-left:4px">{{ l }}</a>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+      <div style="min-width:0">
+        <div style="color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.16em;margin-bottom:18px">STAY CONNECTED</div>
+        <p style="margin:0 0 16px;color:#9fb4c9;font-size:12.5px;line-height:1.6">Get updates on programs, events, and ways to get involved.</p>
+        <form onSubmit="{{ onSubscribe }}" style="display:flex;gap:0;max-width:250px">
+          <label for="nl-email" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Email address</label>
+          <input id="nl-email" type="email" value="{{ email }}" onChange="{{ onEmail }}" placeholder="Your email address" style="flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-right:0;border-radius:6px 0 0 6px;color:#fff;font-family:inherit;font-size:12.5px;padding:12px 14px">
+          <button type="submit" aria-label="Subscribe" style="background:#1f7ae0;border:0;border-radius:0 6px 6px 0;color:#fff;width:46px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .25s ease" style-hover="background:#3d9bff">
+            <svg width="17" height="10" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M1 5h14M11 1l4 4-4 4"/></svg>
+          </button>
+        </form>
+        <div aria-live="polite" style="margin-top:10px;font-size:11.5px;color:{{ noteColor }}">{{ note }}</div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.08);padding:20px 0 26px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap">
+      <div style="color:#7f93a8;font-size:11px">© 2025 Boys &amp; Girls Clubs of Greater Detroit. All rights reserved.</div>
+      <div style="display:flex;gap:18px">
+        <a href="#" style="color:#7f93a8;font-size:11px" style-hover="color:#3d9bff">Privacy Policy</a>
+        <a href="#" style="color:#7f93a8;font-size:11px" style-hover="color:#3d9bff">Terms of Use</a>
+        <a href="#" style="color:#7f93a8;font-size:11px" style-hover="color:#3d9bff">Accessibility</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:2400}}">
+const ic = {
+  people: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17.5" cy="9" r="2.4"/><path d="M16 14.8c2.8 0 5 1.9 5 4.6"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>',
+  hands: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l4-4 4 3 3-1 3 2 4-3 2 3-6 6-4-2-4 2z"/></svg>',
+  case: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="2.5" y="7.5" width="19" height="12" rx="2"/><path d="M9 7.5V6a2 2 0 012-2h2a2 2 0 012 2v1.5M2.5 12.5h19"/></svg>',
+  rocket: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4.5C17 5 19 7 19.5 10.5L9 21l-3-3z"/><path d="M6 18l-2.5 2.5M9.5 8.5L5 9l-1.5 4"/></svg>',
+  code: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 8L4 12l4.5 4M15.5 8L20 12l-4.5 4"/></svg>',
+  camera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="2.5" y="7" width="12" height="10" rx="2"/><path d="M14.5 11l6-3v8l-6-3z"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 20S3.5 14.5 3.5 9.2A4.7 4.7 0 0112 6.6a4.7 4.7 0 018.5 2.6C20.5 14.5 12 20 12 20z"/></svg>',
+  seed: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 21V9M12 9C12 5 9 3 5 3c0 4 3 6 7 6zM12 11c0-3.4 2.6-5 6-5 0 3.4-2.6 5-6 5z"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .8-4.4 4.2 1.1 6-5.3-3-5.3 3 1.1-6L3.4 9.4l6-.8z"/></svg>',
+  ig: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="3.8"/><circle cx="17" cy="7" r="1"/></svg>',
+  fb: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.6-1.5H17V4.2A22 22 0 0014.6 4c-2.4 0-4 1.5-4 4.2v2.3H8v3h2.6V21z"/></svg>',
+  li: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 9h3v11h-3zM6 4a1.8 1.8 0 100 3.6A1.8 1.8 0 006 4zM10 9h2.9v1.5c.6-1 1.8-1.8 3.4-1.8 2.6 0 3.7 1.7 3.7 4.6V20h-3v-6c0-1.5-.5-2.4-1.8-2.4-1.1 0-1.9.8-2.2 1.6V20h-3z"/></svg>',
+  yt: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.3 7.6c-.2-1-1-1.8-2-2C17.6 5.2 12 5.2 12 5.2s-5.6 0-7.3.4c-1 .2-1.8 1-2 2C2.3 9.3 2.3 12 2.3 12s0 2.7.4 4.4c.2 1 1 1.8 2 2 1.7.4 7.3.4 7.3.4s5.6 0 7.3-.4c1-.2 1.8-1 2-2 .4-1.7.4-4.4.4-4.4s0-2.7-.4-4.4zM10 15.3V8.7l5.7 3.3z"/></svg>'
+};
+
+Object.keys(ic).forEach(k => { ic[k] = { __html: ic[k] }; });
+
+// Sample Club locations (approximate coordinates) — replace with real addresses.
+const CLUBS = [
+  { id: 'dt', name: 'Downtown Club', area: 'Downtown Detroit', zip: '48226', ll: [42.3336, -83.0466] },
+  { id: 'sw', name: 'Southwest Club', area: 'Clark Park / Southwest', zip: '48209', ll: [42.3170, -83.1010] },
+  { id: 'hp', name: 'Hiram E. Jackson Club', area: 'Highland Park', zip: '48203', ll: [42.4058, -83.0968] },
+  { id: 'es', name: 'Eastside Club', area: 'Chandler Park', zip: '48213', ll: [42.3830, -82.9450] },
+  { id: 'hm', name: 'Hamtramck Club', area: 'Hamtramck', zip: '48212', ll: [42.3928, -83.0496] },
+  { id: 'nw', name: 'Northwest Club', area: 'Brightmoor', zip: '48219', ll: [42.4014, -83.2560] },
+  { id: 'db', name: 'Dearborn Club', area: 'East Dearborn', zip: '48120', ll: [42.3223, -83.1763] },
+  { id: 'wr', name: 'Warren Club', area: 'Warren', zip: '48091', ll: [42.4900, -83.0130] },
+  { id: 'pn', name: 'Pontiac Club', area: 'Pontiac', zip: '48342', ll: [42.6389, -83.2910] }
+];
+
+class Component extends DCLogic {
+  state = { menuOpen: false, searchOpen: false, email: '', note: '', noteColor: '#9fb4c9', countP: 0, small: false };
+
+  componentDidMount() {
+    this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const v = document.querySelector('video');
+    if (v) {
+      const tryPlay = () => { v.muted = true; v.defaultMuted = true; v.setAttribute('muted', ''); const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+      tryPlay();
+      v.addEventListener('canplay', tryPlay);
+      v.addEventListener('loadeddata', tryPlay);
+      [400, 1200, 2500].forEach(t => setTimeout(tryPlay, t));
+      document.addEventListener('pointerdown', tryPlay, { once: true });
+    }
+    this.initMap();
+    this.startScan();
+    this.setupHovers();
+    this.onScroll = () => {
+      const y = window.scrollY || document.documentElement.scrollTop;
+      const h = this.headerEl;
+      if (h) {
+        h.style.boxShadow = y > 20 ? '0 10px 30px rgba(0,0,0,.35)' : 'none';
+        h.style.background = y > 20 ? 'rgba(6,20,38,.94)' : '#061426';
+        h.style.backdropFilter = y > 20 ? 'blur(10px)' : 'none';
+      }
+      if (this.heroImgEl && !this.reduced) this.heroImgEl.style.transform = 'translateY(' + Math.min(y * 0.12, 70) + 'px) scale(1.04)';
+    };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    this.onResize = () => {
+      const small = window.innerWidth < 780;
+      if (small !== this.state.small) this.setState({ small: small });
+      const narrow = window.innerWidth < 1180;
+      if (this.burgerEl) this.burgerEl.style.display = narrow ? 'flex' : 'none';
+      document.querySelectorAll('nav[aria-label="Main"] > a').forEach(a => { a.style.display = narrow ? 'none' : 'block'; });
+      if (!narrow && this.state.menuOpen) this.setState({ menuOpen: false });
+    };
+    this.onResize();
+    window.addEventListener('resize', this.onResize);
+    this.onScroll();
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const t = document.querySelector(a.getAttribute('href'));
+        if (t) { e.preventDefault(); window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 78, behavior: this.reduced ? 'auto' : 'smooth' }); }
+      });
+    });
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.onScroll);
+    window.removeEventListener('resize', this.onResize);
+    if (this.timer) clearInterval(this.timer);
+    if (this.onScanScroll) { window.removeEventListener('scroll', this.onScanScroll); window.removeEventListener('resize', this.onScanScroll); }
+  }
+
+  initMap(tries) {
+    const n = tries || 0;
+    const el = document.getElementById('club-map');
+    if (!window.L || !el || !el.clientHeight) {
+      if (n < 60) setTimeout(() => this.initMap(n + 1), 250);
+      return;
+    }
+    if (this.map) return;
+    const map = L.map(el, { scrollWheelZoom: false, zoomControl: true });
+    this.map = map;
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors', maxZoom: 18
+    }).addTo(map);
+    this.markers = {};
+    this.pinIcon = size => L.icon({
+      iconUrl: 'uploads/location_53876-25530.avif',
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size + 4]
+    });
+    CLUBS.forEach(c => {
+      const halo = L.circleMarker(c.ll, { radius: 14, color: '#e02323', weight: 1, opacity: .3, fillColor: '#e02323', fillOpacity: .1 }).addTo(map);
+      const dot = L.marker(c.ll, { icon: this.pinIcon(30), riseOnHover: true }).addTo(map);
+      dot.bindPopup('<strong style="font-family:Archivo,sans-serif">' + c.name + '</strong><br><span style="font-family:Archivo,sans-serif;color:#5a6c80">' + c.area + ' &middot; ' + c.zip + '</span>');
+      dot.on('click', () => this.pickClub(c.id, false));
+      this.markers[c.id] = { dot: dot, halo: halo, c: c };
+    });
+    map.fitBounds(CLUBS.map(c => c.ll), { padding: [40, 40] });
+    setTimeout(() => map.invalidateSize(), 400);
+  }
+
+  pickClub(id, fly) {
+    this.setState({ selected: id });
+    const m = this.markers && this.markers[id];
+    if (!m) return;
+    Object.keys(this.markers).forEach(k => {
+      const on = k === id;
+      this.markers[k].dot.setIcon(this.pinIcon(on ? 42 : 30));
+      this.markers[k].dot.setZIndexOffset(on ? 1000 : 0);
+      this.markers[k].halo.setStyle({ fillOpacity: on ? .22 : .1, opacity: on ? .55 : .3, radius: on ? 22 : 14 });
+    });
+    if (fly !== false && this.map) this.map.flyTo(m.c.ll, 13, { duration: .8 });
+    m.dot.openPopup();
+  }
+
+  startScan() {
+    const off = { up: '0,28px', left: '-34px,0', right: '34px,0' };
+    const fmt = n => n.toLocaleString('en-US');
+    // Counts render as their final values; this tween only animates them imperatively.
+    const runCount = () => {
+      const els = Array.from(document.querySelectorAll('[data-count]'));
+      if (!els.length || this.reduced) return;
+      this.countTween = true;
+      const targets = els.map(el => parseInt(el.dataset.count, 10));
+      const suffixes = els.map(el => el.dataset.suffix || '');
+      const start = Date.now(), dur = 1500;
+      const write = (p) => {
+        const e = 1 - Math.pow(1 - p, 3);
+        els.forEach((el, i) => { el.textContent = fmt(Math.round(targets[i] * e)) + suffixes[i]; });
+      };
+      write(0);
+      const iv = setInterval(() => {
+        const p = Math.min((Date.now() - start) / dur, 1);
+        write(p);
+        if (p >= 1) clearInterval(iv);
+      }, 40);
+      this.countIv = iv;
+      setTimeout(() => { clearInterval(iv); write(1); this.countTween = false; }, dur + 150);
+    };
+    const visible = (el, pad) => {
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight || 800;
+      return r.top < vh - Math.min(pad, r.height * 0.5);
+    };
+    this.scan = () => {
+      let pending = 0;
+      document.querySelectorAll('[data-reveal]').forEach(el => {
+        if (el.dataset.shown) {
+          if (el.style.opacity !== '1') { el.style.opacity = '1'; el.style.transform = 'none'; }
+          return;
+        }
+        if (this.reduced) { el.dataset.shown = '1'; el.style.opacity = '1'; el.style.transform = 'none'; return; }
+        if (!el.dataset.init) {
+          const d = (off[el.dataset.reveal] || off.up).split(',');
+          el.style.opacity = '0';
+          el.style.transform = 'translate(' + d[0] + ',' + d[1] + ')';
+          el.style.transition = 'opacity .7s ease, transform .8s cubic-bezier(.2,.7,.3,1)';
+          el.style.transitionDelay = (el.dataset.delay || 0) + 'ms';
+          el.dataset.init = '1';
+          pending++;
+          return;
+        }
+        if (visible(el, 40)) { el.dataset.shown = '1'; el.style.opacity = '1'; el.style.transform = 'none'; }
+        else pending++;
+      });
+      const stat = document.querySelector('[data-count]');
+      if (stat && !this.countTween && visible(stat, 20)) runCount();
+      if (!this.countTween) {
+        document.querySelectorAll('[data-count]').forEach(el => {
+          const t = fmt(parseInt(el.dataset.count, 10)) + (el.dataset.suffix || '');
+          if (el.textContent !== t) el.textContent = t;
+        });
+      }
+      const tl = document.querySelector('[data-timeline]');
+      if (tl && !this.tlDone && visible(tl, 30)) {
+        this.tlDone = true;
+        document.querySelectorAll('[data-tdot]').forEach((d, i) => setTimeout(() => {
+          d.style.opacity = '1'; d.style.transform = 'scale(1)';
+        }, this.reduced ? 0 : i * 180));
+      }
+      if (this.tlDone) {
+        document.querySelectorAll('[data-tdot]').forEach(d => { d.style.opacity = '1'; d.style.transform = 'scale(1)'; });
+      }
+    };
+    this.scan();
+    this.timer = setInterval(this.scan, 160);
+    this.onScanScroll = () => this.scan();
+    window.addEventListener('scroll', this.onScanScroll, { passive: true });
+    window.addEventListener('resize', this.onScanScroll);
+  }
+
+  setupHovers() {
+    document.querySelectorAll('[data-card]').forEach(card => {
+      const zoom = card.querySelector('[data-zoom]');
+      const arrow = card.querySelector('[data-arrow]');
+      const icon = card.querySelector('[data-icon]');
+      card.addEventListener('mouseenter', () => {
+        if (zoom) zoom.style.transform = 'scale(1.08)';
+        if (arrow) arrow.style.transform = 'translateX(5px)';
+        if (icon) icon.style.transform = 'scale(1.1) rotate(-8deg)';
+      });
+      card.addEventListener('mouseleave', () => {
+        if (zoom) zoom.style.transform = 'none';
+        if (arrow) arrow.style.transform = 'none';
+        if (icon) icon.style.transform = 'none';
+      });
+    });
+    document.querySelectorAll('nav[aria-label="Main"] a span').forEach(u => {
+      const a = u.parentElement;
+      a.addEventListener('mouseenter', () => { u.style.width = '100%'; });
+      a.addEventListener('mouseleave', () => { u.style.width = '0'; });
+    });
+  }
+
+  renderVals() {
+    const S = this.state;
+    return {
+      headerRef: el => { this.headerEl = el; },
+      heroImgRef: el => { this.heroImgEl = el; },
+      burgerRef: el => { this.burgerEl = el; },
+      menuOpen: S.menuOpen,
+      searchOpen: S.searchOpen,
+      email: S.email,
+      note: S.note,
+      noteColor: S.noteColor,
+      toggleMenu: () => this.setState(s => ({ menuOpen: !s.menuOpen, searchOpen: false })),
+      toggleSearch: () => this.setState(s => ({ searchOpen: !s.searchOpen })),
+      onEmail: e => this.setState({ email: e.target.value, note: '' }),
+      onSubscribe: e => {
+        e.preventDefault();
+        const ok = /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(S.email.trim());
+        this.setState(ok
+          ? { note: 'Thanks — you\u2019re on the list.', noteColor: '#3d9bff', email: '' }
+          : { note: 'Please enter a valid email address.', noteColor: '#f08a2c' });
+      },
+      heroInset: S.small ? '0' : '0 0 0 26%',
+      heroScrim: S.small ? 'rgba(6,20,38,.58)' : 'transparent',
+      zip: S.zip || '',
+      zipNote: S.zipNote || '',
+      zipColor: S.zipColor || '#5a6c80',
+      onZip: e => this.setState({ zip: e.target.value, zipNote: '' }),
+      onFindClub: e => {
+        e.preventDefault();
+        const z = (S.zip || '').trim();
+        if (!/^\d{5}$/.test(z)) { this.setState({ zipNote: 'Enter a 5-digit ZIP code.', zipColor: '#c96f14' }); return; }
+        const hit = CLUBS.find(c => c.zip === z);
+        if (hit) {
+          this.setState({ zipNote: hit.name + ' is your closest Club.', zipColor: '#1f7ae0' });
+          this.pickClub(hit.id, true);
+        } else {
+          this.setState({ zipNote: 'No Club in ' + z + ' yet — all locations are shown on the map.', zipColor: '#c96f14' });
+          if (this.map) this.map.flyToBounds(CLUBS.map(c => c.ll), { padding: [40, 40], duration: .8 });
+        }
+      },
+      clubs: CLUBS.map(c => {
+        const on = S.selected === c.id;
+        return {
+          name: c.name, area: c.area, zip: c.zip, active: on,
+          bg: on ? '#0a2036' : '#fff',
+          border: on ? '#0a2036' : '#e2e7ee',
+          accent: on ? '#f08a2c' : '#1f7ae0',
+          title: on ? '#fff' : '#0a1a2d',
+          sub: on ? '#9fb4c9' : '#5a6c80',
+          zipColor: on ? '#f0a860' : '#8494a6',
+          pick: () => this.pickClub(c.id, true)
+        };
+      }),
+      eras: [
+        { year: '1926', label: 'First clubhouse' },
+        { year: '1950s', label: 'Game rooms & gyms' },
+        { year: '1980s', label: 'Citywide leagues' },
+        { year: '2000s', label: 'Tech & media labs' },
+        { year: 'Today', label: 'Career pathways' }
+      ],
+      navItems: [
+        { label: 'ABOUT US' }, { label: 'OUR IMPACT' }, { label: 'PROGRAMS' },
+        { label: 'GET INVOLVED' }, { label: 'NEWS & STORIES' }, { label: 'CONTACT' }
+      ],
+      stages: [
+        { num: '01', title: 'BELONG', ages: 'AGES 6–12', copy: 'A safe place to discover, connect, and dream big.', color: '#7bc043', slot: 'belong', src: 'uploads/shawn.jpg', ph: 'Drop image — younger child', arrow: true },
+        { num: '02', title: 'BUILD', ages: 'AGES 13–17', copy: 'Hands-on skills, real-world projects, bright futures.', color: '#1f7ae0', slot: 'build', src: 'uploads/tech-sm.jpg', ph: 'Drop image — teen', arrow: true },
+        { num: '03', title: 'LEAD', ages: 'AGES 18–24', copy: 'Leadership, careers, and impact in our communities.', color: '#f08a2c', slot: 'lead', src: 'uploads/maker.jpg', ph: 'Drop image — young adult', arrow: false }
+      ],
+      stats: (() => {
+        const raw = [
+          { value: 28000, suffix: '+', label: 'YOUTH SERVED ANNUALLY', icon: ic.people },
+          { value: 23, suffix: '', label: 'CLUB LOCATIONS', icon: ic.pin },
+          { value: 250, suffix: '+', label: 'COMMUNITY PARTNERS', icon: ic.hands },
+          { value: 1800, suffix: '+', label: 'PAID OPPORTUNITIES PROVIDED LAST YEAR', icon: ic.case }
+        ];
+        return raw.map(s => Object.assign({}, s, {
+          shown: s.value.toLocaleString('en-US') + s.suffix
+        }));
+      })(),
+      programs: [
+        { title: 'Careers & Entrepreneurship', copy: 'Mentorship, resume-building, business labs, and real-world career pathways.', color: '#4aa832', icon: ic.rocket, slot: 'careers', src: 'uploads/maker.jpg', ph: 'Drop careers image', aria: 'Explore Careers & Entrepreneurship' },
+        { title: 'Technology & Innovation', copy: 'Coding, robotics, AI, design, and the tools to build tomorrow.', color: '#1f7ae0', icon: ic.code, slot: 'technology', src: 'uploads/fashion-studio.webp', ph: 'Drop technology image', aria: 'Explore Technology & Innovation' },
+        { title: 'Arts & Media', copy: 'Storytelling, digital media, music production, and creative expression.', color: '#f08a2c', icon: ic.camera, slot: 'arts', src: 'uploads/tech-sm.jpg', ph: 'Drop arts image', aria: 'Explore Arts & Media' },
+        { title: 'Sports & Wellness', copy: 'Athletics, fitness, and life skills that promote healthy bodies and minds.', color: '#4aa832', icon: ic.heart, slot: 'sports', src: 'uploads/shawn.jpg', ph: 'Drop sports image', aria: 'Explore Sports & Wellness' }
+      ],
+      timeline: [
+        { label: 'DISCOVERED', copy: 'Robotics at age 11', color: '#7bc043', icon: ic.seed },
+        { label: 'DEVELOPED', copy: 'Skills & confidence', color: '#3d9bff', icon: ic.code },
+        { label: 'CONNECTED', copy: 'With mentors & opportunities', color: '#f08a2c', icon: ic.hands },
+        { label: 'LEADS', copy: 'Building a better Detroit', color: '#f5c518', icon: ic.star }
+      ],
+      news: [
+        { date: 'MAY 6, 2025', title: 'Teens Pitch Big Ideas at Annual Youth Entrepreneurship Challenge', slot: 'news-1', src: 'uploads/usher.jpg', ph: 'Drop news image 1' },
+        { date: 'APRIL 28, 2025', title: 'Club Teens Win State Robotics Championship', slot: 'news-2', src: 'uploads/impact.jpg', ph: 'Drop news image 2' },
+        { date: 'APRIL 15, 2025', title: 'New Media Lab Inspires Detroit’s Next Creators', slot: 'news-3', src: 'uploads/tech-sm.jpg', ph: 'Drop news image 3' }
+      ],
+      footerCols: [
+        { title: 'QUICK LINKS', links: ['About Us', 'Our Impact', 'Programs', 'Careers'] },
+        { title: 'GET INVOLVED', links: ['Join a Club', 'Volunteer', 'Donate', 'Corporate Partners'] },
+        { title: 'RESOURCES', links: ['For Parents', 'For Youth', 'News & Stories', 'Contact Us'] }
+      ],
+      socials: [
+        { name: 'Instagram', icon: ic.ig }, { name: 'Facebook', icon: ic.fb },
+        { name: 'LinkedIn', icon: ic.li }, { name: 'YouTube', icon: ic.yt }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
